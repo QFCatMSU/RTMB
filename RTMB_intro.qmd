@@ -166,7 +166,7 @@ f = function(pars) {
 
 - see `glmm.r`
 
-## Objective f(x) for a hierarchical selectivity model, see Meyer and Millar 1999: 
+## Objective f(x) for a hierarchical selectivity model, see Millar and Freyer 1999: 
 
 ```{R echo = TRUE, eval  = FALSE, style= "font-size: 20.5pt;"}
 f = function(pars) {
