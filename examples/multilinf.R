@@ -1,4 +1,4 @@
-# Bence July 2023, cahill added a bit of styling...
+# Bence July 2023, cahill added a bit of styling
 # R script for fitting vonB model to multiple ponds with TMB
 # Allowing for random effects
 
@@ -38,6 +38,7 @@ f = function(pars) {
 
 obj = MakeADFun(f, pars, random = c("logLinfs"))
 fit = nlminb(obj$par, obj$fn, obj$gr)
+fit 
 
 sdr = sdreport(obj)
 sdr
