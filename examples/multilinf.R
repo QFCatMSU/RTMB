@@ -30,8 +30,8 @@ f = function(pars) {
   for (i in 1:nponds) {
     predL[, i] = Linfs[i] * (1 - exp(-K * (A - t0)))
   }
-  nll = -sum(dnorm(x = L, mean = predL, sd = Sig, TRUE))
-  nprand = -sum(dnorm(x = logLinfs, mean = logLinfmn, sd = logLinfsd, TRUE))
+  nll = -sum(dnorm(x = L, mean = predL, sd = Sig, log = TRUE))
+  nprand = -sum(dnorm(x = logLinfs, mean = logLinfmn, sd = logLinfsd, log = TRUE))
   jnll = nll + nprand
   jnll
 }
