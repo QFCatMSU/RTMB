@@ -29,7 +29,7 @@ yobs = rpois(nobs, lambda_i)
 
 data = list(
   yobs = yobs,
-  Xmat = model.matrix(yobs ~ 1 + x1)
+  Xmat = model.matrix(~ 1 + x1)
 )
 
 pars = list(
@@ -56,3 +56,4 @@ opt = nlminb(obj$par, obj$fn, obj$gr)
 
 sdr = sdreport(obj)
 sdr
+

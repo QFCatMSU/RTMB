@@ -6,7 +6,7 @@ library(mvtnorm)
 # loosely following coding style/math in Anderson and Ward 2019 Ecology
 
 # model form:
-# y_i ~ normal(mu_i)
+# y_i ~ pois(lambda_i)
 # mu_i = exp(b0 + eps(site(i)) )
 # eps(s) ~ GRF(0, SIGMA)
 # SIGMA  = gp_sigma^2 * exp(-dist_sites/gp_theta)
