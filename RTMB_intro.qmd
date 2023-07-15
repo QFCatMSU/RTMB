@@ -18,12 +18,12 @@ highlight-style: kate
 
 ## Outline
 
-- Demonstrate an exciting advance with AD
+- Demonstrate a mind-blowing advance with AD
 - Show a few examples that may be useful
     - Start with equations, move to code
 - Talk about debugging via `browser()`
 - Tips and trickery 
-- All code available at <https://github.com/QFCatMSU/RTMB/tree/main>
+- Code for all of this available at: <https://github.com/QFCatMSU/RTMB/tree/main>
 
 ## What is RTMB?
 
