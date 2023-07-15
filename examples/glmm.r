@@ -43,7 +43,7 @@ f = function(pars) {
   sd_site = exp(log_sd_site)                           # back transform
   jnll = 0                                             # initialize
   jnll = jnll - sum(dnorm(eps_site, 0, sd_site, TRUE)) # Pr(random effects)
-  lam_i = exp(                                         # exp link f(x)
+  lam_i = exp(                                         # link f(x)
     Xmat %*% bvec +                                    # fixed effects
     eps_site                                         # random effects
   )

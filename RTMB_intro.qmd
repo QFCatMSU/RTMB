@@ -28,7 +28,7 @@ highlight-style: kate
 ## What is RTMB?
 
 - RTMB is a new package that provides a native R interface for a subset of TMB so you can avoid coding in C++
-- See link: <https://kaskr.r-universe.dev/RTMB>
+- See <https://kaskr.r-universe.dev/RTMB>
 - No longer need to code a `.cpp` file to use AD
 - All(?) the functionality of TMB 
 - Easier for others to read the code (no more `.cpp` files)
@@ -127,7 +127,7 @@ opt
 sdr
 ```
 
-# ***RTMB scales easily to more complicated models***
+# ***RTMB scales to (much) more complicated models***
 
 ## von Bertalanffy growth model: the math
 
@@ -181,7 +181,7 @@ f = function(pars) {
   sd_site = exp(log_sd_site)                           # back transform
   jnll = 0                                             # initialize
   jnll = jnll - sum(dnorm(eps_site, 0, sd_site, TRUE)) # Pr(random effects)
-  lam_i = exp(                                         # exp link f(x)
+  lam_i = exp(                                         # link f(x)
     Xmat %*% bvec +                                    # fixed effects
     eps_site                                           # random effects
   )
