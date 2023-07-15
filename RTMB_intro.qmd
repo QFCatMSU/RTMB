@@ -27,7 +27,7 @@ highlight-style: kate
 
 ## What is RTMB?
 
-- RTMB is a new package that provides a native R interface for a subset of TMB so you can avoid coding in C++.
+- RTMB is a new package that provides a native R interface for a subset of TMB so you can avoid coding in C++
 - See link: <https://kaskr.r-universe.dev/RTMB>
 - No longer need to code a `.cpp` file to use AD
 - All(?) the functionality of TMB 
@@ -127,7 +127,17 @@ opt
 sdr
 ```
 
-# ***RTMB works for more complicated models***
+# ***RTMB scales easily to more complicated models***
+
+## von Bertalanffy growth model: the math
+
+<br><br>
+$$
+\begin{array}{l}
+l_{i}=l_{\infty}\left(1-e^{-k\left(a_{i}-t_{0}\right)}\right)+\varepsilon_{i} \\
+\varepsilon_{i} {\sim} \text{N}\left(0, \sigma^{2}\right)
+\end{array}
+$$
 
 ## RTMB objective f(x) for a von Bertalanffy growth model: 
 ```{R echo = T}
@@ -148,7 +158,23 @@ f = function(pars) {
 - see `vonB.r`
 - can use REPORT(), ADREPORT()
 
-## Objective f(x) for a Poisson hierarchical model: 
+## Poisson GLMM: the math
+<br>
+$$
+\begin{array}{l}
+y_{i, site} \sim \text { Poisson}\left(\lambda_{i, site}\right) \\
+\log \left(\lambda_{i, site}\right)=\beta_{0} + \beta_{1} \cdot x_{1}+\epsilon_{site} \\
+\epsilon_{site} \sim \text{N}(0,\sigma^{2}_{site})
+\end{array}
+$$
+
+- $\beta_{0}$ is global intercept shared among sites
+
+- $x_{1}$ is a covariate 
+
+- $\epsilon_{site}$ is normally distributed random effect 
+
+## Objective f(x) for a Poisson GLMM: 
 ```{R echo = T}
 f = function(pars) {
   getAll(data, pars)
@@ -167,7 +193,7 @@ f = function(pars) {
 
 - see `glmm.r`
 
-## Objective f(x) for a hierarchical selectivity model, see Millar and Freyer 1999: 
+## Objective f(x) for a hierarchical normal selectivity model, adapted from Millar and Freyer 1999: 
 
 ```{R echo = TRUE, eval  = FALSE, style= "font-size: 20.5pt;"}
 f = function(pars) {
@@ -197,6 +223,23 @@ f = function(pars) {
 
 - see `by_net.r`
 
+## Spatially explicit Poisson GLMM: the math
+<br>
+$$
+\begin{array}{l}
+y_{i, site} \sim \text { Poisson}\left(\lambda_{i, site}\right) \\
+\log \left(\lambda_{i, site}\right)=\beta_{0} + \epsilon_{site} \\
+\epsilon_{site} \sim \text{MVN}(0,\Sigma_{site})
+\end{array}
+$$
+
+<br>
+- where $\Sigma_{site}$ is calculated via some correlation f(x)
+
+<br>
+- we'll use exponential
+
+
 ## Objective f(x) for a spatially explicit GLMM:
 
 ```{R echo = TRUE, eval  = FALSE}
@@ -209,10 +252,14 @@ f = function(pars){
   jnll = jnll - sum(dpois(y_obs, y_hat), TRUE)
   jnll 
 }
-  ```
+```
 
-- wut dark majicks is this??!!
+- majicks
 - see `grf.r`
+
+## Jim Bence's fancy vonB: math
+
+- ? 
 
 ## Objective f(x) for a Bence's fancy vonB:
 
@@ -243,7 +290,7 @@ f = function(pars) {
 ## Debugging 
 
 - Because RTMB is written in R, can use debugging tools (!)
-- `browser()` in a f(x) allows you to easily step through and check calculations
+- `browser()` allows you to step through and check calculations
   - no longer need `cout` or `REPORT()` calls to check calculations
 - Can also use breakpoints
 - Jump to demonstration 
@@ -256,6 +303,5 @@ f = function(pars) {
 - Hash out each line to find the offending line(s)
 - Discuss other oddities 
 
-## TODO
+## Questions? 
 
-- add equations 
