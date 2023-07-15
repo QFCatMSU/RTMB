@@ -1,9 +1,9 @@
 ---
-title: Fitting nonlinear models using automatic differentiation in R via RTMB
+title: Fitting models via maximum likelihood using RTMB
 title-slide-attributes:
     data-background-image: "https://qfcatmsu.github.io/Images/dark-big.png"  
     data-background-size: "40%"
-    data-background-position: "7% 96%"
+    data-background-position: "7% 90%"
 author: Christopher Cahill 
 date: 21 July 2023
 date-format: "D MMMM YYYY"
@@ -40,7 +40,7 @@ highlight-style: kate
 - The math: 
 
 $$
-y_{i}=\beta_{0}+\beta_{1} x_{i}+\epsilon_{n} \quad \text {where } \quad \epsilon_{i} \sim \operatorname{N}(0, \sigma)
+y_{i}=\beta_{0}+\beta_{1} x_{i}+\epsilon_{i} \quad \text {where } \quad \epsilon_{i} \sim \operatorname{N}(0, \sigma)
 $$ 
 
 ```{R echo = F}
@@ -55,8 +55,9 @@ x1 = runif(n, -1, 1)
 y_obs = rnorm(n, b0 + b1 * x1, sd)
 ```
 
-```{R echo = T}
-plot(y_obs~x1, xlab = "predictor", ylab = "observed data")
+```{R echo = T, fig.align = "center"}
+par(mar=c(5,6,4,1) + 0.1)
+plot(y_obs~x1, xlab = "x1", ylab = "observed data", cex.lab = 2.5)
 ```
 
 ## Linear regression (RTMB)
@@ -238,3 +239,23 @@ f = function(pars) {
   ```
 
 - see `multilinf.r`
+
+## Debugging 
+
+- Because RTMB is written in R, can use debugging tools (!)
+- `browser()` in a f(x) allows you to easily step through and check calculations
+  - no longer need `cout` or `REPORT()` calls to check calculations
+- Can also use breakpoints
+- Jump to demonstration 
+
+## Tips 
+
+- Talk about `advector` error messages
+  - Often(?) means you are using something that isn't supported by RTMB
+- Make sure you are using base R / RTMB f(x)'s
+- Hash out each line to find the offending line(s)
+- Discuss other oddities 
+
+## TODO
+
+- add equations 
