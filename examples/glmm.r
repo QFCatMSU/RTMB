@@ -45,7 +45,7 @@ f = function(pars) {
   jnll = jnll - sum(dnorm(eps_site, 0, sd_site, TRUE)) # Pr(random effects)
   lam_i = exp(                                         # link f(x)
     Xmat %*% bvec +                                    # fixed effects
-    eps_site                                         # random effects
+    eps_site                                           # random effects
   )
   jnll = jnll - sum(dpois(yobs, lam_i, TRUE))          # Pr(observations|random effects)
   jnll

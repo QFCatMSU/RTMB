@@ -4,7 +4,7 @@ title-slide-attributes:
     data-background-image: "https://qfcatmsu.github.io/Images/dark-big.png"  
     data-background-size: "40%"
     data-background-position: "7% 90%"
-author: Christopher Cahill 
+author: Christopher Cahill & Jim Bence 
 date: 21 July 2023
 date-format: "D MMMM YYYY"
 format: 
@@ -29,13 +29,13 @@ highlight-style: kate
 
 - RTMB is a new package that provides a native R interface for a subset of TMB so you can avoid coding in C++
 - See <https://kaskr.r-universe.dev/RTMB>
-- No longer need to code a `.cpp` file to use AD
-- All(?) the functionality of TMB 
-- Easier for others to read the code (no more `.cpp` files)
+- In all applications we have tried all TMB functionality was available!
+- Because code is all in R, both easier to code and for others to read that code -  a game changer!
 - A game changer *if* you know how to code in R, create an objective f(x) for your model 
+- No compiling or compiling errors!
 - Bottom line: less time developing and testing models, more intuitive code 
 
-## Linear regression  
+## Linear regression in RTMB 
 
 - The math: 
 
@@ -305,3 +305,6 @@ f = function(pars) {
 
 ## Questions? 
 
+<br><br>
+
+- <cahill11@msu.edu>
