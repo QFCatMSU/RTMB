@@ -4,7 +4,7 @@ title-slide-attributes:
     data-background-image: "https://qfcatmsu.github.io/Images/dark-big.png"  
     data-background-size: "40%"
     data-background-position: "7% 90%"
-author: Christopher Cahill & Jim Bence 
+author: Chris Cahill and Jim Bence 
 date: 21 July 2023
 date-format: "D MMMM YYYY"
 format: 
