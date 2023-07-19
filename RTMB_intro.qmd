@@ -255,13 +255,22 @@ f = function(pars){
 ```
 
 - majicks
+- `dist_sites` is a matrix of euclidean distances among sites and is read in as data 
 - see `grf.r`
 
-## Jim Bence's fancy vonB: math
+## Conventional vonB with random $L_\infty$: math
+$$
+\begin{array}{c}
+L_{i, j}=L_{\infty_i}\left(1-\exp \left(-K\left(a_{i, j}-t_{0}\right)+\varepsilon_{i, j}\right.\right. \\
+\varepsilon_{i, j} \sim N\left(0, \sigma^{2}\right) \\
+\log \left(L_{\infty_i}\right) \sim N\left(\log \left(L_{\infty}\right), \sigma_{L \infty}^{2}\right)
+\end{array}
+$$
 
-- ? 
+- Note $L_\infty$ is the median and not mean asymptote among ponds
+- Also note, the model code uses likelihood equation with equivalent $L_{i, j} \sim N\left(\hat{L}_{i, j}, \sigma^{2}\right)$
 
-## Objective f(x) for a Bence's fancy vonB:
+## Objective f(x) for a Bence's vonB:
 
 ```{R echo = TRUE, eval  = FALSE, style= "font-size: 22.5pt;"}
 f = function(pars) {
@@ -293,7 +302,7 @@ f = function(pars) {
 - `browser()` allows you to step through and check calculations
   - no longer need `cout` or `REPORT()` calls to check calculations
 - Can also use breakpoints
-- Jump to demonstration 
+- Jump to demonstration (in-person)
 
 ## Tips 
 
