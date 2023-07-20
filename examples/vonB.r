@@ -13,12 +13,12 @@ library(RTMB)
 linf = 500
 vbk = 0.2
 t0 = -1.5
-sig2 = 30
+sig = 30
 age_i = rep(0:35, 5)
 n_fish = length(age_i)
 
 set.seed(123)
-l_obs_i = rnorm(n_fish, mean = linf * (1 - exp(-vbk * (age_i - t0))), sd = sig2)
+l_obs_i = rnorm(n_fish, mean = linf * (1 - exp(-vbk * (age_i - t0))), sd = sig)
 
 #--------------------------------------------------------------------
 # estimate it
