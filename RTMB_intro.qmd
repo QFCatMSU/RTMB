@@ -261,7 +261,7 @@ f = function(pars){
 ## Conventional vonB with random $L_\infty$: math
 $$
 \begin{array}{c}
-L_{i, j}=L_{\infty_i}\left(1-\exp \left(-K\left(a_{i, j}-t_{0}\right)+\varepsilon_{i, j}\right.\right. \\
+L_{i, j}=L_{\infty_i}\left(1-\exp \left(-K\left(a_{i, j}-t_{0}\right)))+\varepsilon_{i, j}\right.\right. \\
 \varepsilon_{i, j} \sim N\left(0, \sigma^{2}\right) \\
 \log \left(L_{\infty_i}\right) \sim N\left(\log \left(L_{\infty}\right), \sigma_{L \infty}^{2}\right)
 \end{array}
