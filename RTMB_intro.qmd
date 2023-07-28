@@ -296,6 +296,71 @@ f = function(pars) {
 
 - see `multilinf.r`
 
+## Objective f(x) for a Ricker stock-recruit model with a random walk $\alpha$: math 
+
+TODO
+
+## Objective f(x) for a Ricker stock-recruit model with a random walk $\alpha$
+
+```{R echo = TRUE, eval  = FALSE, style= "font-size: 22.5pt;"}
+f = function(pars) {
+  getAll(data, pars)
+  jnll =  0 # initialize
+  # initial state
+  jnll =  jnll - dnorm(alphas[1], exp(log_alpha0), exp(log_sd_alpha), TRUE)
+  # walk through the remaining years
+  for (t in 2:length(data$year)) {
+    jnll =  jnll - dnorm(alphas[t], alphas[t - 1], exp(log_sd_alpha), TRUE)
+  }
+  # calculate systematic component:
+  log_RS_pred =  alphas - beta * S
+  # likelihood for observations vs. predictions:
+  jnll =  jnll - sum(dnorm(log_RS_obs, log_RS_pred, exp(log_sdr), TRUE))
+  REPORT(log_RS_pred)
+  ADREPORT(alphas)
+  jnll
+}
+  ```
+
+- see `rw_ricker.r`
+
+## Objective f(x) for a Ricker stock-recruit model with an AR-1 $\alpha$: math 
+
+TODO
+
+## Objective f(x) for an AR-1 Ricker $\alpha$
+
+```{R echo = TRUE, eval  = FALSE, style= "font-size: 22.5pt;"}
+to_cor =  function(x) { # -inf to inf --> -1 to 1 transform
+  2 / (1 + exp(-2 * x)) - 1
+}
+
+f =  function(pars) {
+  getAll(data, pars)
+  n_year =  length(R)
+  pred_log_r =  rep(0, n_year)
+  rho =  to_cor(trans_rho) # back transform
+  sd_eps =  exp(log_sd_eps)
+  sd_obs =  exp(log_sd_obs)
+  jnll =  0
+  jnll =  jnll - dnorm(eps_ar[1], 0, sqrt(1 - rho^2) * sd_eps, TRUE) # initialize
+  for (t in 2:n_year) {
+    jnll =  jnll - dnorm(eps_ar[t],                # current eps
+                         rho * eps_ar[t - 1],      # is a function of eps[t-1]
+                         sqrt(1 - rho^2) * sd_eps, # + some stationary noise
+                         TRUE
+                        )
+  }
+  pred_log_R =  log_alpha + eps_ar - beta * S + log(S)
+  jnll =  jnll - sum(dnorm(log(R), pred_log_R, sd_obs, TRUE))
+  jnll
+}
+
+
+```
+
+- see `ar1_ricker.r`
+
 ## Debugging 
 
 - Because RTMB is written in R, can use debugging tools (!)
