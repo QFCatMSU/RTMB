@@ -11,7 +11,7 @@ data =  list(R = data$R, S = data$S)
 
 pars =  list(
   log_alpha = coef(ls_ricker)[1],
-  eps_ar = rep(0, length(data$R)),
+  eps_a = rep(0, length(data$R)),
   beta = -coef(ls_ricker)[2],
   log_sd_eps = log(sqrt(ls_report$sigma^2 / 2)),
   log_sd_obs = log(sqrt(ls_report$sigma^2 / 2)), # 1/2 resid var
@@ -31,23 +31,23 @@ f =  function(pars) {
   sd_eps =  exp(log_sd_eps)
   sd_obs =  exp(log_sd_obs)
   jnll =  0
-  jnll =  jnll - dnorm(eps_ar[1], 0, sqrt(1 - rho^2) * sd_eps, TRUE) # initialize
+  jnll =  jnll - dnorm(eps_a[1], 0, sqrt(1 - rho^2) * sd_eps, TRUE) # initialize
   for (t in 2:n_year) {
-    jnll =  jnll - dnorm(eps_ar[t],                # current eps
-                         rho * eps_ar[t - 1],      # is a function of eps[t-1]
+    jnll =  jnll - dnorm(eps_a[t],                # current eps
+                         rho * eps_a[t - 1],      # is a function of eps[t-1]
                          sqrt(1 - rho^2) * sd_eps, # + some stationary noise
                          TRUE
                         )
   }
-  pred_log_R =  log_alpha + eps_ar - beta * S + log(S)
-  alphas = exp(log_alpha + eps_ar) 
+  pred_log_R =  log_alpha + eps_a - beta * S + log(S)
+  alphas = exp(log_alpha + eps_a) 
   ADREPORT(alphas)
   REPORT(rho)
   jnll =  jnll - sum(dnorm(log(R), pred_log_R, sd_obs, TRUE))
   jnll
 }
 
-obj =  MakeADFun(f, pars, random = c("eps_ar"))
+obj =  MakeADFun(f, pars, random = c("eps_a"))
 opt =  nlminb(obj$par, obj$fn, obj$gr)
 opt
 sdr =  sdreport(obj)
