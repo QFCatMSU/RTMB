@@ -14,7 +14,7 @@ pars =  list(
   eps_ar = rep(0, length(data$R)),
   beta = -coef(ls_ricker)[2],
   log_sd_eps = log(sqrt(ls_report$sigma^2 / 2)),
-  log_sd_obs = log(sqrt(ls_report$sigma^2 / 2)), # #1/2 resid var
+  log_sd_obs = log(sqrt(ls_report$sigma^2 / 2)), # 1/2 resid var
   trans_rho = 1 # transformed rho
 )
 
