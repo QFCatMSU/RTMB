@@ -26,15 +26,14 @@ to_cor =  function(x) {
 f =  function(pars) {
   getAll(data, pars)
   n_year =  length(R)
-  pred_log_r =  rep(0, n_year)
   rho =  to_cor(trans_rho) # back transform
   sd_eps =  exp(log_sd_eps)
   sd_obs =  exp(log_sd_obs)
   jnll =  0
   jnll =  jnll - dnorm(eps_a[1], 0, sqrt(1 - rho^2) * sd_eps, TRUE) # initialize
   for (t in 2:n_year) {
-    jnll =  jnll - dnorm(eps_a[t],                # current eps
-                         rho * eps_a[t - 1],      # is a function of eps[t-1]
+    jnll =  jnll - dnorm(eps_a[t],                 # current eps
+                         rho * eps_a[t - 1],       # is a function of eps[t-1]
                          sqrt(1 - rho^2) * sd_eps, # + some stationary noise
                          TRUE
                         )
@@ -44,10 +43,11 @@ f =  function(pars) {
   ADREPORT(alphas)
   REPORT(rho)
   jnll =  jnll - sum(dnorm(log(R), pred_log_R, sd_obs, TRUE))
-  jnll
+  jnll 
 }
 
 obj =  MakeADFun(f, pars, random = c("eps_a"))
+
 opt =  nlminb(obj$par, obj$fn, obj$gr)
 opt
 sdr =  sdreport(obj)

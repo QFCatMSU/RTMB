@@ -338,7 +338,6 @@ to_cor =  function(x) { # -inf to inf --> -1 to 1 transform
 f =  function(pars) {
   getAll(data, pars)
   n_year =  length(R)
-  pred_log_r =  rep(0, n_year)
   rho =  to_cor(trans_rho) # back transform
   sd_eps =  exp(log_sd_eps)
   sd_obs =  exp(log_sd_obs)
