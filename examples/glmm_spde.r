@@ -1,12 +1,13 @@
 library(RTMB)
 library(tidyverse)
 
-n_site <- 100
-sim1 <- geoR::grf(n = n_site, cov.pars = c(1, .25)) # var, range
+n_site <- 30
+set.seed(12334)
+sim1 <- geoR::grf(n = n_site, cov.pars = c(1, .2)) # var, range
 
 x <- sim1$data
 
-n_per_site <- 100
+n_per_site <- 30
 
 locs <- sim1$coords
 n_site <- nrow(locs)
@@ -83,4 +84,3 @@ res <- cbind(sdrep$value, sdrep$value + sdrep$sd %o% c(-1.96, 1.96))
 colnames(res) <- c("MLE", "lower95", "upper95")
 print(res)
 
-# note kappa = sqrt(8)/range
