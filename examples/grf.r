@@ -1,7 +1,9 @@
 library(RTMB)
 library(mvtnorm)
 
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 NOTE-this is not yet correct and needs to be fixed...
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 #--------------------------------------------------------------------------------
 # A hierarchical Poisson model with a spatially-explicit random effect, 
