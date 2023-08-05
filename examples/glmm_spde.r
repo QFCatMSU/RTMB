@@ -1,20 +1,8 @@
 library(RTMB)
-library(geoR)
 library(tidyverse)
 
 n_site <- 100
-sim1 <- grf(n = n_site, cov.pars = c(1, .25)) # var, range
-
-my_df <- data.frame(
-  yobs = data$y_obs,
-  x = rep(locs[, 1], each = n_per_site),
-  y = rep(locs[, 2], each = n_per_site)
-)
-
-my_df %>%
-  ggplot(aes(x, y, fill = yobs - mean(yobs))) +
-  geom_point(pch = 21) +
-  scale_fill_gradient2()
+sim1 <- geoR::grf(n = n_site, cov.pars = c(1, .25)) # var, range
 
 x <- sim1$data
 
@@ -45,6 +33,17 @@ data$spde <- spde$param.inla[c("M0", "M1", "M2")]
 data$meshidxloc <- mesh$idx$loc # RTMB: 1-based indexing !
 n_s <- nrow(data$spde$M0) # Number of points in mesh (including supporting points)
 
+my_df <- data.frame(
+  eps = x,
+  x = locs[, 1],
+  y = locs[, 2]
+)
+
+my_df %>%
+  ggplot(aes(x, y, fill = eps)) +
+  geom_point(pch = 21) +
+  scale_fill_gradient2()
+
 parameters <- list(
   beta0 = log(beta0),
   log_tau = -2.0,
@@ -69,16 +68,17 @@ f <- function(parameters) {
   for (i in 1:length(y_obs)) {
     jnll <- jnll - dpois(y_obs[i], exp(beta0 + eps_s[loc_idx[i]]), TRUE)
   }
-  Range <- sqrt(8) / exp(log_kappa)
+  range <- sqrt(8) / exp(log_kappa)
+  sig_o <- 1/sqrt(4*pi * exp(2*log_tau)*exp(2*log_kappa))
   ADREPORT(kappa)
-  ADREPORT(Range)
-  ADREPORT(tau)
+  ADREPORT(range)
+  ADREPORT(sig_o)
   jnll
 }
 
 obj <- MakeADFun(f, parameters, random = "eps_s")
 opt <- nlminb(obj$par, obj$fn, obj$gr)
-sdrep <- sdreport(obj, opt$par)
+sdrep <- sdreport(obj)
 res <- cbind(sdrep$value, sdrep$value + sdrep$sd %o% c(-1.96, 1.96))
 colnames(res) <- c("MLE", "lower95", "upper95")
 print(res)

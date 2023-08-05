@@ -68,3 +68,10 @@ for (t in 1:length(year)) {
     col = "#115d9a"
   )
 }
+
+
+data(rivers)
+f <- function(p) { -sum(dnorm(rivers, p$mu, p$sd, log=TRUE)) }
+obj <- MakeADFun(f, list(mu=0, sd=1), silent=TRUE)
+opt <- nlminb(obj$par, obj$fn, obj$gr)
+sdreport(obj)
