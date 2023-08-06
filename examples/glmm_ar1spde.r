@@ -97,12 +97,12 @@ f <- function(parameters) {
   rho <- to_cor(trho)
   Q <- Q_spde(spde, kappa)
   jnll <- 0
-  jnll <- jnll - dgmrf(eps_st[, 1], 0, Q, 1L) # initialize
+  jnll <- jnll - dgmrf(eps_st[, 1], 0, Q, TRUE) # initialize
   for (t in 2:n_year) { # autoregress
-    jnll <- jnll - dgmrf(eps_st[, t], rho * eps_st[, t - 1], Q, 1L, sqrt(1 - rho^2))
+    jnll <- jnll - dgmrf(eps_st[, t], rho * eps_st[, t - 1], Q, TRUE, sqrt(1 - rho^2))
   }
   for (i in 1:length(y_obs)) {
-    jnll <- jnll - dpois(y_obs[i], exp(beta0 + eps_st[site[i], year[i]] / tau), 1L)
+    jnll <- jnll - dpois(y_obs[i], exp(beta0 + eps_st[site[i], year[i]] / tau), TRUE)
   }
   range <- sqrt(8) / exp(log_kappa)
   sig_o <- 1 / sqrt(4 * pi * exp(2 * log_tau) * exp(2 * log_kappa))
