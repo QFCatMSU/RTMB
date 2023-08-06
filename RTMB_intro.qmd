@@ -223,40 +223,13 @@ f = function(pars) {
 
 - see `by_net.r`
 
-## Spatially explicit Poisson GLMM: the math
+## Spatially explicit Poisson GLMM: 
 <br>
-$$
-\begin{array}{l}
-y_{i, site} \sim \text { Poisson}\left(\lambda_{i, site}\right) \\
-\log \left(\lambda_{i, site}\right)=\beta_{0} + \epsilon_{site} \\
-\epsilon_{site} \sim \text{MVN}(0,\Sigma_{site})
-\end{array}
-$$
+- see `glmm_spde.r`
 
+## Spatial-temporal Poisson GLMM: 
 <br>
-- where $\Sigma_{site}$ is calculated via some correlation f(x)
-
-<br>
-- we'll use exponential
-
-
-## Objective f(x) for a spatially explicit GLMM:
-
-```{R echo = TRUE, eval  = FALSE}
-f = function(pars){
-  getAll(data, pars)
-  SIGMA = gp_sigma * exp(-dist_sites / gp_theta)
-  jnll = 0
-  jnll = jnll - sum(dmvnorm(eps_s, SIGMA, TRUE))
-  y_hat = exp(beta0 + eps_s) # index on site_i in more complex examples
-  jnll = jnll - sum(dpois(y_obs, y_hat), TRUE)
-  jnll 
-}
-```
-
-- majicks
-- `dist_sites` is a matrix of euclidean distances among sites and is read in as data 
-- see `grf.r`
+- see `glmm_ar1spde.r`
 
 ## Conventional vonB with random $L_\infty$: math
 $$
