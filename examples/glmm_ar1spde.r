@@ -68,8 +68,6 @@ mesh <- INLA::inla.mesh.create(locs,
 spde <- INLA::inla.spde2.matern(mesh, alpha = 2)
 data$spde <- spde$param.inla[c("M0", "M1", "M2")]
 n_s <- nrow(data$spde$M0) # Number of points in mesh (including supporting points)
-plot(mesh)
-points(locs)
 
 parameters <- list(
   beta0 = log(beta0),
@@ -102,7 +100,7 @@ f <- function(parameters) {
     jnll <- jnll - dgmrf(eps_st[, t], rho * eps_st[, t - 1], Q, TRUE, sqrt(1 - rho^2))
   }
   for (i in 1:length(y_obs)) {
-    jnll <- jnll - dpois(y_obs[i], exp(beta0 + eps_st[site[i], year[i]]), TRUE)
+    jnll <- jnll - dpois(y_obs[i], exp(beta0 + eps_st[site[i], year[i]] / tau), TRUE)
   }
   range <- sqrt(8) / exp(log_kappa)
   sig_o <- 1 / sqrt(4 * pi * exp(2 * log_tau) * exp(2 * log_kappa))
