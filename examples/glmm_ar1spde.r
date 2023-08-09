@@ -11,12 +11,12 @@ range <- 0.2
 rho <- 0.5
 
 # intialize, get locs
-sim <- geoR::grf(n = n_site, cov.pars = c(spatial_var, range)) # var, range
+sim <- geoR::grf(n = n_site, cov.model = "matern", cov.pars = c(spatial_var, range)) # var, range
 omega_dev_st[, 1] <- sim$data
 locs <- sim$coords
 
 for (t in 2:n_year) {
-  sim <- geoR::grf(n = n_site, grid = locs, cov.pars = c(spatial_var, range)) # var, range
+  sim <- geoR::grf(n = n_site, grid = locs, cov.model = "matern", cov.pars = c(spatial_var, range)) # var, range
   omega_dev_st[, t] <- sim$data
 }
 
