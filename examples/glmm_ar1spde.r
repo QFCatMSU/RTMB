@@ -1,5 +1,7 @@
 library(RTMB)
 library(tidyverse)
+library(INLA)
+library(geoR)
 
 # generate a spatial-temporal field evolving via AR-1
 set.seed(666)
