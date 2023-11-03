@@ -14,8 +14,8 @@ sigma <- 1 # population (likelihood) sd
 betas <- c(14, -0.15) # average intercept and slope
 sigmas <- c(2, 1) # intercept and slope sds
 rho <- -0.3 # correlation between intercepts and slopes
-rho_mat <- matrix(c(1, rho, rho, 1), nrow = 2) # correlation matrix
-SIGMA <- diag(sigmas) %*% rho_mat %*% diag(sigmas) # var covar
+OMEGA <- matrix(c(1, rho, rho, 1), nrow = 2) # correlation matrix
+SIGMA <- diag(sigmas) %*% OMEGA %*% diag(sigmas) # var covar
 
 # draw correlated slopes and intercepts:
 set.seed(5621)
