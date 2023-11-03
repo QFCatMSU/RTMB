@@ -2,12 +2,15 @@ library(RTMB)
 library(tidyverse)
 
 data = read.csv("data/sel_dat.csv")
+year = data$year - min(data$year) + 1
+
+n_year = 7 # 2007 to 2013
+
 n_sites = length(unique(data$net_id))
 catches = as.matrix(data[, which(grepl("mesh", colnames(data)))])
 colnames(catches) = NULL
 
 locs <- unique(data[, c("easting_km", "northing_km")])
-plot(locs)
 
 mesh <- INLA::inla.mesh.create(locs)
 
@@ -25,7 +28,9 @@ data <- list(
   meshes = c(51, 57, 64, 70, 76, 83, 89, 95, 102, 108, 114, 121, 127),
   n_site = length(unique(data$net)),
   n_obs = nrow(data),
-  loc_idx = data$net, 
+  loc_idx = data$net,
+  year_idx = year,
+  n_year = n_year,
   lens = data[, 2],
   catches = catches
 )
@@ -36,14 +41,14 @@ spde <- INLA::inla.spde2.matern(mesh, alpha = 2)
 data$spde <- spde$param.inla[c("M0", "M1", "M2")]
 
 pars = list(
-  ln_k1 = 5.6,
-  ln_k2 = 4.2,
-  eps_k1 = rep(0, mesh$n),
-  eps_k2 = rep(0, mesh$n),
-  log_tau1 = 2.12,
-  log_tau2 = -2.0, 
-  log_kappa1 = -1.43, 
-  log_kappa2 = 0
+  ln_k1 = 6.69,
+  ln_k2 = 4.5,
+  eps_k1_st = matrix(0.0, nrow = mesh$n, ncol = n_year),
+  eps_k2_st = matrix(0.0, nrow = mesh$n, ncol = n_year),
+  log_tau1 = 1.02,
+  log_tau2 = 1.02,
+  log_kappa1 = -.4, 
+  log_kappa2 = 0 
 )
 
 Q_spde <- function(spde, kappa) {
@@ -61,23 +66,24 @@ f <- function(parameters) {
   tau2 <- exp(log_tau2)
   kappa1 <- exp(log_kappa1) 
   kappa2 <- exp(log_kappa2) 
-  
   Q1 <- Q_spde(spde, kappa1)
   Q2 <- Q_spde(spde, kappa2)
 
   jnll <- 0
-  jnll <- jnll - dgmrf(eps_k1, 0, Q1, log = TRUE, scale = 1 / tau1) # mean0 k1 deviates
-  jnll <- jnll - dgmrf(eps_k2, 0, Q2, log = TRUE, scale = 1 / tau2) # mean0 k2 deviates
+  for (t in 1:n_year) { 
+    jnll <- jnll - dgmrf(eps_k1_st[, t], 0, Q1, TRUE, scale = 1 / tau1)
+    jnll <- jnll - dgmrf(eps_k2_st[, t], 0, Q2, TRUE, scale = 1 / tau2)
+  }
   
-  k1 = exp(ln_k1 + eps_k1)
-  k2 = exp(ln_k2 + eps_k2)
+  k1 = exp(ln_k1 + eps_k1_st)
+  k2 = exp(ln_k2 + eps_k2_st)
   
   sel_mat = phi_mat = matrix(0, nrow(catches), ncol(catches))
 
   for (i in 1:nrow(sel_mat)) {
     for (j in 1:ncol(sel_mat)) {
-      sel_mat[i, j] = exp(-(lens[i] - k1[loc_idx[i]] * rel_size[j])^2 /
-        (2 * k2[loc_idx[i]]^2 * rel_size[j]^2))
+      sel_mat[i, j] = exp(-(lens[i] - k1[loc_idx[i], year_idx[i]] * rel_size[j])^2 /
+        (2 * k2[loc_idx[i], year_idx[i]]^2 * rel_size[j]^2))
     }
   }
   sel_sums = rowSums(sel_mat)
@@ -103,7 +109,7 @@ f <- function(parameters) {
   jnll
 }
 
-obj <- MakeADFun(f, pars, random = c("eps_k1", "eps_k2"))
+obj <- MakeADFun(f, pars, random = c("eps_k1_st", "eps_k2_st"))
 obj$fn()
 obj$gr()
 
