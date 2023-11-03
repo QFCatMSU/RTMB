@@ -2,7 +2,7 @@ library(RTMB)
 data = read.csv("data/sel_dat.csv")
 
 n_sites = length(unique(data$net_id))
-catches = as.matrix(data[, -c(1, 2)])
+catches = as.matrix(data[, which(grepl("mesh", colnames(data)))])
 colnames(catches) = NULL
 
 data = list(
@@ -62,6 +62,6 @@ f = function(pars) {
 
 obj = MakeADFun(f, pars, random = c("k_site"))
 opt = nlminb(obj$par, obj$fn, obj$gr)
-opt$objective # should solve to 13070.43
+opt$objective 
 sdr = sdreport(obj)
 sdr
