@@ -10,6 +10,9 @@ locs <- unique(data[, c("easting_km", "northing_km")])
 plot(locs)
 
 mesh <- INLA::inla.mesh.create(locs)
+
+mesh = INLA::inla.mesh.2d(loc=locs, max.edge=c(62,1000))
+
 plot(mesh)
 points(locs, col = "#075057", pch = 16)
 mesh$n
@@ -29,6 +32,7 @@ data <- list(
 data$rel_size = data$meshes / data$meshes[1]
 
 spde <- INLA::inla.spde2.matern(mesh, alpha = 2)
+
 data$spde <- spde$param.inla[c("M0", "M1", "M2")]
 
 pars = list(
@@ -38,7 +42,8 @@ pars = list(
   eps_k2 = rep(0, mesh$n),
   log_tau1 = 2.12,
   log_tau2 = -2.0, 
-  log_kappa = -1.43
+  log_kappa1 = -1.43, 
+  log_kappa2 = 0
 )
 
 Q_spde <- function(spde, kappa) {
@@ -54,13 +59,15 @@ f <- function(parameters) {
   getAll(data, parameters)
   tau1 <- exp(log_tau1)
   tau2 <- exp(log_tau2)
-  kappa <- exp(log_kappa) # share matern kappa across GMRFs
+  kappa1 <- exp(log_kappa1) 
+  kappa2 <- exp(log_kappa2) # share matern kappa across GMRFs
   
-  Q <- Q_spde(spde, kappa)
-  
+  Q1 <- Q_spde(spde, kappa1)
+  Q2 <- Q_spde(spde, kappa2)
+
   jnll <- 0
-  jnll <- jnll - dgmrf(eps_k1, 0, Q, log = TRUE, scale = 1 / tau1) # mean0 k1 deviates
-  jnll <- jnll - dgmrf(eps_k2, 0, Q, log = TRUE, scale = 1 / tau2) # mean0 k2 deviates
+  jnll <- jnll - dgmrf(eps_k1, 0, Q1, log = TRUE, scale = 1 / tau1) # mean0 k1 deviates
+  jnll <- jnll - dgmrf(eps_k2, 0, Q2, log = TRUE, scale = 1 / tau2) # mean0 k2 deviates
   
   k1 = exp(ln_k1 + eps_k1)
   k2 = exp(ln_k2 + eps_k2)
@@ -82,12 +89,14 @@ f <- function(parameters) {
   jnll = jnll - sum(catches * log(phi_mat))
 
   # Derived variables 
-  range <- sqrt(8) / exp(log_kappa)
-  sig_o_k1 <- 1 / sqrt(4 * pi * exp(2 * log_tau1) * exp(2 * log_kappa))
-  sig_o_k2 <- 1 / sqrt(4 * pi * exp(2 * log_tau2) * exp(2 * log_kappa))
+  range1 <- sqrt(8) / exp(log_kappa1)
+  range2 <- sqrt(8) / exp(log_kappa2)
 
-  ADREPORT(kappa)
-  ADREPORT(range)
+  sig_o_k1 <- 1 / sqrt(4 * pi * exp(2 * log_tau1) * exp(2 * log_kappa1))
+  sig_o_k2 <- 1 / sqrt(4 * pi * exp(2 * log_tau2) * exp(2 * log_kappa2))
+
+  ADREPORT(range1)
+  ADREPORT(range2)
   ADREPORT(sig_o_k1)
   ADREPORT(sig_o_k2)
 
