@@ -12,9 +12,7 @@ colnames(catches) = NULL
 
 locs <- unique(data[, c("easting_km", "northing_km")])
 
-mesh <- INLA::inla.mesh.create(locs)
-
-mesh = INLA::inla.mesh.2d(loc=locs, max.edge=c(62,1000))
+mesh = INLA::inla.mesh.2d(loc=locs, max.edge=c(6,50))
 
 plot(mesh)
 points(locs, col = "#075057", pch = 16)
@@ -116,3 +114,6 @@ obj$gr()
 opt <- nlminb(obj$par, obj$fn, obj$gr)
 sdrep <- sdreport(obj)
 sdrep
+
+sdrep$value
+sdrep$sd
