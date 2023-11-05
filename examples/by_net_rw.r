@@ -13,10 +13,11 @@ colnames(catches) = NULL
 locs <- unique(data[, c("easting_km", "northing_km")])
 
 mesh = INLA::inla.mesh.2d(loc=locs, max.edge=c(6,50))
-
+# mesh = INLA::inla.mesh.2d(loc=locs, max.edge = c(10, 100)) 
+ 
+mesh$n
 plot(mesh)
 points(locs, col = "#075057", pch = 16)
-mesh$n
 n_sites
 
 data <- within(data, net <- as.numeric(interaction(data$net_id, drop = TRUE, lex.order = F)))
@@ -39,14 +40,14 @@ spde <- INLA::inla.spde2.matern(mesh, alpha = 2)
 data$spde <- spde$param.inla[c("M0", "M1", "M2")]
 
 pars = list(
-  ln_k1 = 6.69,
-  ln_k2 = 4.5,
+  ln_k1 = 5.6,
+  ln_k2 = 4.2,
   eps_k1_st = matrix(0.0, nrow = mesh$n, ncol = n_year),
   eps_k2_st = matrix(0.0, nrow = mesh$n, ncol = n_year),
-  log_tau1 = 1.02,
-  log_tau2 = 1.02,
-  log_kappa1 = -.4, 
-  log_kappa2 = 0 
+  log_tau1 = 1.95,
+  log_tau2 = -1.2,
+  log_kappa1 = -.8, 
+  log_kappa2 = 0.57 
 )
 
 Q_spde <- function(spde, kappa) {
@@ -68,9 +69,11 @@ f <- function(parameters) {
   Q2 <- Q_spde(spde, kappa2)
 
   jnll <- 0
-  for (t in 1:n_year) { 
-    jnll <- jnll - dgmrf(eps_k1_st[,t], 0, Q1, TRUE, scale = 1 / tau1)
-    jnll <- jnll - dgmrf(eps_k2_st[,t], 0, Q2, TRUE, scale = 1 / tau2)
+  jnll <- jnll - dgmrf(eps_k1_st[,1], 0, Q1, TRUE, scale = 1 / tau1)
+  jnll <- jnll - dgmrf(eps_k2_st[,1], 0, Q2, TRUE, scale = 1 / tau2)
+  for (t in 2:n_year) { 
+    jnll <- jnll - dgmrf(eps_k1_st[,t], eps_k1_st[,t-1], Q1, TRUE, scale = 1 / tau1)
+    jnll <- jnll - dgmrf(eps_k2_st[,t], eps_k1_st[,t-1], Q2, TRUE, scale = 1 / tau2)
   }
   
   k1 = exp(ln_k1 + eps_k1_st)
@@ -108,8 +111,8 @@ f <- function(parameters) {
 }
 
 obj <- MakeADFun(f, pars, random = c("eps_k1_st", "eps_k2_st"))
-obj$fn()
-obj$gr()
+#obj$fn()
+#obj$gr()
 
 opt <- nlminb(obj$par, obj$fn, obj$gr)
 sdrep <- sdreport(obj)
