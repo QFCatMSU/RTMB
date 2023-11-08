@@ -11,7 +11,7 @@ unstructured
 data =  list(k = 3)
 
 pars =  list(
-  sigmas = rep(0.1, 3)
+  sigmas = rep(0.1, (data$k*data$k - data$k)/2)
 )
 
 getAll(data, pars)
