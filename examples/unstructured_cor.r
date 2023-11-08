@@ -19,9 +19,11 @@ us <- unstructured(k) # set up an unstructured object of dim k
 us 
 
 OMEGA <- us$corr(sigmas) # correlation matrix 
+OMEGA
 
 # Now must set up covariance matrix as 
 SIGMA <- diag(sigmas) %*% OMEGA %*% diag(sigmas)
+SIGMA
 
 # where SIGMA can be used in dmvnorm
 # note sigmas are correlations so must be bounded between correctly
