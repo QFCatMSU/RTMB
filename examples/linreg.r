@@ -57,5 +57,4 @@ doone <- function() {
   objs$report()$y_pred
 }
 
-sim <- replicate (100 , doone () )
-
+sim <- replicate (100 , doone() )
