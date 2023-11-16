@@ -15,25 +15,26 @@ y_obs = rnorm(n, b0 + b1 * x1, sd)
 # estimate it
 
 data = list(
-  n = n,
   y_obs = y_obs,
   x1 = x1
 )
 
-pars = list(
+par = list(
   b0 = 1,
   b1 = 1,
   log_sd = log(3)
 )
 
-f = function(pars) {
-  getAll(data, pars) # replaces DATA_XX, PARAMETER_YY
+f = function(par) {
+  getAll(data, par) 
+  y_obs <- OBS(y_obs)
+  sigma = exp(log_sd)
   y_pred = b0 + b1 * x1
-  nll = -sum(dnorm(y_obs, y_pred, exp(log_sd), log = TRUE))
-  nll
+  REPORT(y_pred)
+  -sum(dnorm(y_obs, y_pred, sigma, TRUE))
 }
 
-obj = MakeADFun(f, pars)
+obj = MakeADFun(f, par)
 obj$fn() # objective function
 obj$gr() # gradients
 
@@ -41,4 +42,20 @@ opt = nlminb(obj$par, obj$fn, obj$gr)
 opt
 
 sdr = sdreport(obj)
-sdr
+sdr 
+
+# do a simulation 
+
+obj$simulate()
+
+odat <- data 
+
+doone <- function() {
+  data$y_obs <<- obj$simulate()$y_obs
+  objs <- MakeADFun(f, par, silent = TRUE)
+  opts <- nlminb(objs$par, objs$fn, objs$gr)
+  objs$report()$y_pred
+}
+
+sim <- replicate (100 , doone () )
+
