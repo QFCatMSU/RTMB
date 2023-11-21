@@ -7,11 +7,11 @@ names(data)[2:3] =  c("R", "S")
 ls_ricker =  lm(log(data$R) ~ data$S, offset = log(data$S))
 ls_report =  summary(ls_ricker)
 
-data =  list(R = data$R, S = data$S)
+data =  list(logR = log(data$R), S = data$S)
 
-pars =  list(
+par =  list(
   log_alpha = coef(ls_ricker)[1],
-  eps_a = rep(0, length(data$R)),
+  eps_a = rep(0, length(data$logR)),
   beta = -coef(ls_ricker)[2],
   log_sd_eps = log(sqrt(ls_report$sigma^2 / 2)),
   log_sd_obs = log(sqrt(ls_report$sigma^2 / 2)), # 1/2 resid var
@@ -23,9 +23,10 @@ to_cor =  function(x) {
   2 / (1 + exp(-2 * x)) - 1
 }
 
-f =  function(pars) {
-  getAll(data, pars)
-  n_year =  length(R)
+f =  function(par) {
+  getAll(data, par)
+  logR <- OBS(logR)
+  n_year <- length(logR)
   rho =  to_cor(trans_rho) # back transform
   sd_eps =  exp(log_sd_eps) # unconditional sd of AR1 process
   sd_obs =  exp(log_sd_obs)
@@ -42,21 +43,27 @@ f =  function(pars) {
   alphas = exp(log_alpha + eps_a) 
   ADREPORT(alphas)
   REPORT(rho)
-  jnll =  jnll - sum(dnorm(log(R), pred_log_R, sd_obs, TRUE))
+  jnll =  jnll - sum(dnorm(logR, pred_log_R, sd_obs, TRUE))
   jnll 
 }
 
-obj =  MakeADFun(f, pars, random = c("eps_a"))
+obj =  MakeADFun(f, par, random = c("eps_a"))
 
 opt =  nlminb(obj$par, obj$fn, obj$gr)
 opt
 sdr =  sdreport(obj)
 sdr
 
+obj$simulate()
+checkConsistency(obj)
+
+# osa <- oneStepPredict(obj, "logR", "keep")
+# qqnorm(osa$residual); abline(0,1)
+
 #----------
 # plotting 
 
-year =  1:length(data$R)
+year =  1:length(data$logR)
 plot(sdr$par.random ~ year,
   ylab = expression(alpha[t]), xlab = "year",
   ylim = c(-3, 3)

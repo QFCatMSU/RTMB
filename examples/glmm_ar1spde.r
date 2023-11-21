@@ -92,6 +92,7 @@ Q_spde <- function(spde, kappa) {
 
 f <- function(parameters) {
   getAll(data, parameters)
+  y_obs <- OBS(y_obs)
   tau <- exp(log_tau)
   kappa <- exp(log_kappa)
   rho <- to_cor(trho)

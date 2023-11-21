@@ -61,6 +61,7 @@ spdeMatrices <- spde$param.inla[c("M0", "M1", "M2")]
 
 f <- function(parameters) {
   getAll(data, parameters)
+  catches <- OBS(catches)
   tau1 <- exp(log_tau1)
   tau2 <- exp(log_tau2)
   kappa1 <- exp(log_kappa1) 
@@ -93,7 +94,8 @@ f <- function(parameters) {
       phi_mat[i, j] = sel_mat[i, j] / sel_sums[i]
     }
   }
-  jnll = jnll - sum(catches * log(phi_mat))
+  #jnll = jnll - sum(catches * log(phi_mat))
+  jnll = jnll - sum(dpois(catches, phi_mat, log = TRUE)) # coding to allow simulation
 
   # Derived variables 
   range1 <- sqrt(8) / exp(log_kappa1)
@@ -120,3 +122,5 @@ sdrep
 
 sdrep$value
 sdrep$sd
+
+# check <- checkConsistency(obj, estimate = TRUE)

@@ -1,18 +1,18 @@
 library(RTMB)
 library(tidyverse)
 
-data = read.csv("data/sel_dat.csv")
-year = data$year - min(data$year) + 1
+data <- read.csv("data/sel_dat.csv")
+year <- data$year - min(data$year) + 1
 
-n_year = 7 # 2007 to 2013
+n_year <- 7 # 2007 to 2013
 
-n_sites = length(unique(data$net_id))
-catches = as.matrix(data[, which(grepl("mesh", colnames(data)))])
-colnames(catches) = NULL
+n_sites <- length(unique(data$net_id))
+catches <- as.matrix(data[, which(grepl("mesh", colnames(data)))])
+colnames(catches) <- NULL
 
 locs <- unique(data[, c("easting_km", "northing_km")])
 
-mesh = INLA::inla.mesh.2d(loc=locs, max.edge=c(6,50))
+mesh <- INLA::inla.mesh.2d(loc = locs, max.edge = c(6, 50))
 
 plot(mesh)
 points(locs, col = "#075057", pch = 16)
@@ -32,21 +32,21 @@ data <- list(
   lens = data[, 2],
   catches = catches
 )
-data$rel_size = data$meshes / data$meshes[1]
+data$rel_size <- data$meshes / data$meshes[1]
 
 spde <- INLA::inla.spde2.matern(mesh, alpha = 2)
 
 data$spde <- spde$param.inla[c("M0", "M1", "M2")]
 
-pars = list(
+pars <- list(
   ln_k1 = 6.69,
   ln_k2 = 4.5,
   eps_k1_st = matrix(0.0, nrow = mesh$n, ncol = n_year),
   eps_k2_st = matrix(0.0, nrow = mesh$n, ncol = n_year),
   log_tau1 = 1.02,
   log_tau2 = 1.02,
-  log_kappa1 = -.4, 
-  log_kappa2 = 0 
+  log_kappa1 = -.4,
+  log_kappa2 = 0
 )
 
 Q_spde <- function(spde, kappa) {
@@ -60,39 +60,41 @@ spdeMatrices <- spde$param.inla[c("M0", "M1", "M2")]
 
 f <- function(parameters) {
   getAll(data, parameters)
+  catches <- OBS(catches)
   tau1 <- exp(log_tau1)
   tau2 <- exp(log_tau2)
-  kappa1 <- exp(log_kappa1) 
-  kappa2 <- exp(log_kappa2) 
+  kappa1 <- exp(log_kappa1)
+  kappa2 <- exp(log_kappa2)
   Q1 <- Q_spde(spde, kappa1)
   Q2 <- Q_spde(spde, kappa2)
 
   jnll <- 0
-  for (t in 1:n_year) { 
-    jnll <- jnll - dgmrf(eps_k1_st[,t], 0, Q1, TRUE, scale = 1 / tau1)
-    jnll <- jnll - dgmrf(eps_k2_st[,t], 0, Q2, TRUE, scale = 1 / tau2)
+  for (t in 1:n_year) {
+    jnll <- jnll - dgmrf(eps_k1_st[, t], 0, Q1, TRUE, scale = 1 / tau1)
+    jnll <- jnll - dgmrf(eps_k2_st[, t], 0, Q2, TRUE, scale = 1 / tau2)
   }
-  
-  k1 = exp(ln_k1 + eps_k1_st)
-  k2 = exp(ln_k2 + eps_k2_st)
-  
-  sel_mat = phi_mat = matrix(0, nrow(catches), ncol(catches))
+
+  k1 <- exp(ln_k1 + eps_k1_st)
+  k2 <- exp(ln_k2 + eps_k2_st)
+
+  sel_mat <- phi_mat <- matrix(0, nrow(catches), ncol(catches))
 
   for (i in 1:nrow(sel_mat)) {
     for (j in 1:ncol(sel_mat)) {
-      sel_mat[i, j] = exp(-(lens[i] - k1[loc_idx[i], year_idx[i]] * rel_size[j])^2 /
+      sel_mat[i, j] <- exp(-(lens[i] - k1[loc_idx[i], year_idx[i]] * rel_size[j])^2 /
         (2 * k2[loc_idx[i], year_idx[i]]^2 * rel_size[j]^2))
     }
   }
-  sel_sums = rowSums(sel_mat)
+  sel_sums <- rowSums(sel_mat)
   for (i in 1:nrow(phi_mat)) {
     for (j in 1:ncol(phi_mat)) {
-      phi_mat[i, j] = sel_mat[i, j] / sel_sums[i]
+      phi_mat[i, j] <- sel_mat[i, j] / sel_sums[i]
     }
   }
-  jnll = jnll - sum(catches * log(phi_mat))
+  # jnll = jnll - sum(catches * log(phi_mat))
+  jnll <- jnll - sum(dpois(catches, phi_mat, log = TRUE)) # coding to allow simulation
 
-  # Derived variables 
+  # Derived variables
   range1 <- sqrt(8) / exp(log_kappa1)
   range2 <- sqrt(8) / exp(log_kappa2)
 
@@ -117,3 +119,28 @@ sdrep
 
 sdrep$value
 sdrep$sd
+
+# set.seed(6266)
+# system.time(
+#   chk <- checkConsistency(obj, estimate = TRUE, n = 500)
+# )
+
+# summary(chk)$estimate$par
+# par(mfrow = c(2, 3))
+# hist(summary(chk)$estimate$par$ln_k1, breaks = 20)
+# abline(v = summary(chk)$par[1])
+
+# hist(summary(chk)$estimate$par$ln_k2, breaks = 20)
+# abline(v = summary(chk)$par[2])
+
+# hist(summary(chk)$estimate$par$log_tau1, breaks = 20)
+# abline(v = summary(chk)$par[3])
+
+# hist(summary(chk)$estimate$par$log_tau2, breaks = 20)
+# abline(v = summary(chk)$par[4])
+
+# hist(summary(chk)$estimate$par$log_kappa1, breaks = 20)
+# abline(v = summary(chk)$par[5])
+
+# hist(summary(chk)$estimate$par$log_kappa2, breaks = 20)
+# abline(v = summary(chk)$par[6])

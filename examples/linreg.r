@@ -45,7 +45,6 @@ sdr = sdreport(obj)
 sdr 
 
 # do a simulation 
-
 obj$simulate()
 
 odat <- data 

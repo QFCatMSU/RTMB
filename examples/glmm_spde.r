@@ -64,6 +64,7 @@ Q_spde <- function(spde, kappa) {
 
 f <- function(parameters) {
   getAll(data, parameters)
+  y_obs <- OBS(y_obs)
   tau <- exp(log_tau)
   kappa <- exp(log_kappa)
   Q <- Q_spde(spde, kappa)
@@ -83,6 +84,7 @@ f <- function(parameters) {
 obj <- MakeADFun(f, parameters, random = "eps_s")
 opt <- nlminb(obj$par, obj$fn, obj$gr)
 sdrep <- sdreport(obj)
+
 truth <- c(sqrt(8)/range, range, sqrt(spatial_var)) 
 res <- cbind(sdrep$value, sdrep$value + sdrep$sd %o% c(-1.96, 1.96), truth)
 colnames(res) <- c("MLE", "lower95", "upper95", "truth")
