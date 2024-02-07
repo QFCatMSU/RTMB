@@ -1,7 +1,7 @@
 library(RTMB) #install rtmb
 data =  read.csv("data/sr_dat.csv")
 data$year =  1:nrow(data)
-names(data)[2:3] =  c("R", "S")
+names(data)[2:3] =  c("R", "S") # test
 
 # get starting values 
 ls_ricker =  lm(log(data$R) ~ data$S, offset = log(data$S))
