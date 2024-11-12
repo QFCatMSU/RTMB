@@ -31,11 +31,11 @@ f =  function(par) {
   sd_eps =  exp(log_sd_eps) # unconditional sd of AR1 process
   sd_obs =  exp(log_sd_obs)
   jnll =  0
-  jnll =  jnll - dnorm(eps_a[1], 0, sd_eps, TRUE) # initialize
+  jnll =  jnll - dnorm(eps_a[1], 0, sqrt(1 - rho^2) * sd_eps, TRUE) # initialize
   for (t in 2:n_year) {
     jnll =  jnll - dnorm(eps_a[t],                 # current eps
                          rho * eps_a[t - 1],       # is a function of eps[t-1]
-                         sqrt(1 - rho^2) * sd_eps, # + some stationary noise
+                         sd_eps, # + some stationary noise
                          TRUE
                         )
   }
